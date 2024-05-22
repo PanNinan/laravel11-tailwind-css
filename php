@@ -1,0 +1,1 @@
+/usr/local/Cellar/php@8.2/8.2.17/bin/php
