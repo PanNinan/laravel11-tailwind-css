@@ -1,6 +1,9 @@
 @extends('app')
-
-@section('content')
+@section('top-js')
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.js"
+            integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+@endsection
+@section('top-css')
     <style>
         .min-height-100 {
             min-height: 100px; /* 设置每一行的最小高度 */
@@ -25,6 +28,8 @@
             background-color: #ffffff; /* 设置背景色为 #ececf4 */
         }
     </style>
+@endsection
+@section('content')
     <div class="container">
         <div class="">
             <a href="{{ route('index') }}" class="btn btn-secondary btn-sm">返回</a>
@@ -141,8 +146,8 @@
                     <h1 class="modal-title fs-5" id="staticBackdropLabel">心跳</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <table class="table table-striped table-bordered">
+                <div class="modal-body shadow-sm">
+                    <table class="table table-striped table-bordered text-center">
                         <thead>
                         <tr>
                             <th scope="col">异常数据类型</th>
@@ -170,11 +175,6 @@
             </div>
         </div>
     </div>
-
-    @section('top-js')
-        <script src="https://code.jquery.com/jquery-3.7.1.slim.js"
-                integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
-    @endsection
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             jQuery(document).ready(function () {
@@ -193,14 +193,14 @@
                 },
                 toolbox: {
                     feature: {
-                        dataView: {show: true, readOnly: false},
-                        magicType: {show: true, type: ['line', 'bar']},
+                        dataView: {show: false, readOnly: false},
+                        magicType: {show: false, type: ['line', 'bar']},
                         restore: {show: true},
-                        saveAsImage: {show: true}
+                        saveAsImage: {show: false}
                     }
                 },
                 legend: {
-                    data: ['Evaporation', 'Temperature']
+                    data: ['每日异常次数', '同型号终端平均值', '同区域终端平均值']
                 },
                 xAxis: [
                     {
@@ -214,32 +214,42 @@
                 yAxis: [
                     {
                         type: 'value',
-                        name: 'Precipitation',
+                        name: '每日异常次数',
                         min: 0,
                         max: 250,
                         interval: 50,
                         axisLabel: {
-                            formatter: '{value} ml'
+                            formatter: '{value}'
                         }
                     },
                     {
                         type: 'value',
-                        name: 'Temperature',
+                        name: '同型号终端平均值',
                         min: 0,
                         max: 25,
                         interval: 5,
                         axisLabel: {
-                            formatter: '{value} °C'
+                            formatter: '{value}'
                         }
-                    }
+                    },
+                    {
+                        type: 'value',
+                        name: '同区域终端平均值',
+                        min: 0,
+                        max: 25,
+                        interval: 5,
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    },
                 ],
                 series: [
                     {
-                        name: 'Evaporation',
+                        name: '每日异常次数',
                         type: 'bar',
                         tooltip: {
                             valueFormatter: function (value) {
-                                return value + ' ml';
+                                return value;
                             }
                         },
                         data: [
@@ -247,15 +257,26 @@
                         ]
                     },
                     {
-                        name: 'Temperature',
+                        name: '同型号终端平均值',
                         type: 'line',
                         yAxisIndex: 1,
                         tooltip: {
                             valueFormatter: function (value) {
-                                return value + ' °C';
+                                return value;
                             }
                         },
                         data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+                    },
+                    {
+                        name: '同区域终端平均值',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        tooltip: {
+                            valueFormatter: function (value) {
+                                return value;
+                            }
+                        },
+                        data: [1.0, 1.2, 2.3, 6.5, 7.3, 4.2, 15.3, 29.4, 22.0, 11.5, 12.8, 3.2]
                     }
                 ]
             };
@@ -264,8 +285,8 @@
             const myChart2 = echarts.init(document.getElementById('chart2'));
             option = {
                 title: {
-                    text: 'Referer of a Website',
-                    subtext: 'Fake Data',
+                    text: '',
+                    subtext: '',
                     left: 'center'
                 },
                 tooltip: {
@@ -281,11 +302,11 @@
                         type: 'pie',
                         radius: '50%',
                         data: [
-                            {value: 1048, name: 'Search Engine'},
-                            {value: 735, name: 'Direct'},
-                            {value: 580, name: 'Email'},
-                            {value: 484, name: 'Union Ads'},
-                            {value: 300, name: 'Video Ads'}
+                            {value: 104, name: '设备状态数据缺失'},
+                            {value: 735, name: '传感器数据缺失'},
+                            {value: 580, name: '传感器连接异常'},
+                            {value: 484, name: '六轴SD数据缺失'},
+                            {value: 300, name: '油位数据缺失'}
                         ],
                         emphasis: {
                             itemStyle: {

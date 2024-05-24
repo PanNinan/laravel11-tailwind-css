@@ -1,5 +1,8 @@
 @extends('app')
-
+@section('top-js')
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.js"
+            integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+@endsection
 @section('content')
     <form class="row">
         <div class="col-lg form-floating mb-3">
@@ -12,15 +15,33 @@
         </div>
         <div class="col-lg mb-3 form-floating">
             <select class="form-select" id="errorType">
-                <option selected value="0">GPS</option>
-                <option value="1">工时</option>
-                <option value="2">油位</option>
+                <option selected value="0">全部</option>
+                <option value="1">终端设备状态数据缺失</option>
+                <option value="2">终端GSM信号值异常</option>
+                <option value="3">传感器列表数据缺失</option>
+                <option value="4">传感器连接状态异常</option>
+                <option value="5">六轴SD数据缺失</option>
+                <option value="6">传感器设备状态数据缺失</option>
+                <option value="7">传感器蓝牙连接状态异常</option>
+                <option value="8">油位数据缺失</option>
+                <option value="9">油位传感器信号强度异常</option>
+                <option value="10">传感器三轴数据缺失</option>
+                <option value="11">传感器三轴数据异常</option>
             </select>
             <label for="errorType">异常数据</label>
         </div>
         <div class="col-lg mb-3 form-floating">
             <input type="email" class="form-control" id="searchDate" placeholder="">
             <label for="searchDate" class="form-label">查询日期</label>
+
+            <div class="form-group">
+                <div class='input-group date' id='datetimepicker1'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+                </div>
+            </div>
         </div>
         <div class="col-lg mb-3 d-flex align-items-center">
             <div>
@@ -28,7 +49,7 @@
                 <button type="button" class="btn btn-secondary btn-sm" id="reset">重置</button>
             </div>
             <div class="m-lg-2">
-                <button type="button" class="btn btn-primary btn-sm" id="config">异常设置</button>
+                <a href="{{ route('setting') }}" type="button" class="btn btn-info btn-sm" id="config">异常设置</a>
             </div>
         </div>
     </form>
@@ -64,5 +85,12 @@
             </tbody>
         </table>
     </div>
-
+    <script>
+        $(function () {
+            console.log('123')
+            // $('#datetimepicker1').datetimepicker();
+        });
+    </script>
 @endsection
+
+
