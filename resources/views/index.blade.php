@@ -30,7 +30,8 @@
             <label for="errorType">异常数据</label>
         </div>
         <div class="col-lg mb-3 form-floating">
-            <input type="email" class="form-control" id="searchDate" placeholder="">
+            <input type="text" class="form-control" id="searchDate" name="searchDate" placeholder=""
+                   value="{{ request()->get('searchDate') }}">
             <label for="searchDate" class="form-label">查询日期</label>
         </div>
         <div class="col-lg mb-3 d-flex align-items-center">
@@ -52,7 +53,7 @@
                 <th scope="row">机械类型</th>
                 <th scope="row">异常数据</th>
                 <th scope="row">电量</th>
-                <th scope="row">智能终端</th>
+                <th scope="row">硬件</th>
                 <th scope="row">操作</th>
             </tr>
             </thead>
@@ -63,8 +64,8 @@
                     <td class="align-middle py-3">{{$record->machine_id}}</td>
                     <td class="align-middle py-3">{{$record->category?->category_name}}</td>
                     <td class="align-middle py-3">{{$ruleMap[$record->rule_id] ?? ''}}</td>
-                    <td class="align-middle py-3">{{$record->device?->battery_percent}}%</td>
-                    <td class="align-middle py-3">{{$record->device?->model}}</td>
+                    <td class="align-middle py-3">{{$record->device?->battery_percent ? $record->device?->battery_percent . '%' : '-'}}</td>
+                    <td class="align-middle py-3">{{$record->type == 1 ? $record->device?->product?->product_model : $record->sensor?->product?->product_model}}</td>
                     <td class="align-middle py-3">
                         <div class="d-flex justify-content-center">
                             <a class="btn btn-primary btn-sm"

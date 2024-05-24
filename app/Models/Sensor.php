@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Device extends Model
+class Sensor extends Model
 {
-    protected $table = 'device';
+    protected $table = 'sensor';
 
     public function product()
     {

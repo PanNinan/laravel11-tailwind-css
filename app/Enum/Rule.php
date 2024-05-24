@@ -17,4 +17,9 @@ class Rule
         10 => '传感器三轴数据缺失',
         11 => '传感器三轴数据异常',
     ];
+
+    public static function translate($index): string
+    {
+        return self::MAP[$index] ?? '';
+    }
 }

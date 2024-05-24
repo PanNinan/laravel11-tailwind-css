@@ -37,20 +37,27 @@
 
         <div class="row row-cols-4 mt-2 min-height-100 custom-bg-gray">
             <div class="col pt-3 custom-bg-gray">
-                <div class="">机械名称：测试机械1234</div>
+                <div class="">机械名称：{{ $record->machine?->machine_name }}</div>
             </div>
             <div class="col pt-3 custom-bg-gray">
-                <div class="">机械ID：102786</div>
+                <div class="">机械ID：{{ $record->machine_id }}</div>
             </div>
             <div class="col pt-3 custom-bg-gray">
-                <div class="">机械类型：挖掘机</div>
+                <div class="">机械类型：{{ $record->category?->category_name }}</div>
             </div>
             <div class="col pt-3 custom-bg-gray">
-                <div class="">工作模式：下发-实时A</div>
-                <div class="">当前：实时A</div>
+                <div class="">电量：{{ $record->type == 1 ? $record->device?->battery_percent . '%' : '-' }}</div>
             </div>
-            <div class="col mt-1 pt-1 pb-2 custom-bg-gray">
-                <div class="">智能终端： Z30185001700 Z03.0(正常)</div>
+            <div class="col-6 mt-1 pt-1 pb-2 custom-bg-gray">
+                @if($record->type == 1)
+                    <div class="">智能终端： {{ $record->device?->sn }} {{ $record->device?->product?->product_model }}
+                        (正常)
+                    </div>
+                @else
+                    <div class="">传感器： {{ $record->sensor?->sn }} {{ $record->sensor?->product?->product_model }}
+                        (正常)
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -58,11 +65,12 @@
             <div class="pt-3">
                 <p><i class="bi bi-cpu-fill"></i>智能分析</p>
             </div>
+            {{--            todo --}}
             <div>
-                <p>该机械今日异常数据包括：设备状态数据缺失</p>
+                <p>该机械今日异常数据包括：{{$ruleNames}}</p>
             </div>
             <div>
-                <p>数据异常可能原因：1该类型终端硬件异常</p>
+                <p>数据异常可能原因：1该类型终端硬件异常....</p>
             </div>
         </div>
 
@@ -77,63 +85,21 @@
             </div>
         </div>
 
-        <div class="row mt-3 min-height-200 align-items-center custom-bg-gray">
+        <div class="row mt-3 min-height-200 align-items-center justify-content-between custom-bg-gray">
             <p><i class="bi bi-fan"></i>数据状态</p>
-            <div class="col m-lg-2 custom-bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>设置状态</div>
-                    <div>
-                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
-                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
+            @foreach($dataStatistics as $item)
+                <div class="col-md-3 m-lg-2 custom-bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>{{ $item['name'] }}</div>
+                        <div>
+                            <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
+                               data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
+                        </div>
                     </div>
+                    <div class="mt-2">今日异常：{{$item['today']??0}}次</div>
+                    <div class="mt-2">近3天异常：{{$item['three_day']??0}}次</div>
                 </div>
-                <div class="mt-2">今日异常：2次</div>
-                <div class="mt-2">近3天异常：5次</div>
-            </div>
-            <div class="col m-lg-2 custom-bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>传感器列表</div>
-                    <div>
-                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
-                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
-                    </div>
-                </div>
-                <div class="mt-2">今日异常：2次</div>
-                <div class="mt-2">近3天异常：5次</div>
-            </div>
-            <div class="col m-lg-2 custom-bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>模式参数</div>
-                    <div>
-                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
-                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
-                    </div>
-                </div>
-                <div class="mt-2">今日异常：2次</div>
-                <div class="mt-2">近3天异常：5次</div>
-            </div>
-            <div class="col m-lg-2 custom-bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>GPS</div>
-                    <div>
-                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
-                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
-                    </div>
-                </div>
-                <div class="mt-2">今日异常：2次</div>
-                <div class="mt-2">近3天异常：5次</div>
-            </div>
-            <div class="col m-lg-2 custom-bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>心跳</div>
-                    <div>
-                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
-                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
-                    </div>
-                </div>
-                <div class="mt-2">今日异常：2次</div>
-                <div class="mt-2">近3天异常：5次</div>
-            </div>
+            @endforeach
         </div>
     </div>
 
@@ -157,20 +123,14 @@
                         </thead>
                         <tbody class="">
                         @for ($i = 0; $i < 10; $i++)
-                        <tr>
-                            <th scope="row">设备状态数据缺失</th>
-                            <td>2024-05-24 11:11:11</td>
-                            <td>2024-05-24 18:59:59</td>
-                        </tr>
+                            <tr>
+                                <th scope="row">设备状态数据缺失</th>
+                                <td>2024-05-24 11:11:11</td>
+                                <td>2024-05-24 18:59:59</td>
+                            </tr>
                         @endfor
                         </tbody>
                     </table>
-
-
-                </div>
-                <div class="modal-footer">
-                    {{--<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Understood</button>--}}
                 </div>
             </div>
         </div>
@@ -181,6 +141,10 @@
 
             });
             const myChart1 = echarts.init(document.getElementById('chart1'));
+            const xDate = {!! json_encode($xDate) !!};
+            const y1 = {!! json_encode($y1) !!};
+            const y2 = {!! json_encode($y2) !!};
+            const y3 = {!! json_encode($y3) !!};
             let option = {
                 tooltip: {
                     trigger: 'axis',
@@ -205,7 +169,7 @@
                 xAxis: [
                     {
                         type: 'category',
-                        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        data: xDate,
                         axisPointer: {
                             type: 'shadow'
                         }
@@ -216,8 +180,8 @@
                         type: 'value',
                         name: '每日异常次数',
                         min: 0,
-                        max: 250,
-                        interval: 50,
+                        max: Math.max(...y1) + 10,
+                        // interval: 50,
                         axisLabel: {
                             formatter: '{value}'
                         }
@@ -226,7 +190,7 @@
                         type: 'value',
                         name: '同型号终端平均值',
                         min: 0,
-                        max: 25,
+                        max: Math.max(...y2) + 10,
                         interval: 5,
                         axisLabel: {
                             formatter: '{value}'
@@ -236,7 +200,7 @@
                         type: 'value',
                         name: '同区域终端平均值',
                         min: 0,
-                        max: 25,
+                        max: Math.max(...y3) + 10,
                         interval: 5,
                         axisLabel: {
                             formatter: '{value}'
@@ -252,9 +216,7 @@
                                 return value;
                             }
                         },
-                        data: [
-                            2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-                        ]
+                        data: y1
                     },
                     {
                         name: '同型号终端平均值',
@@ -265,7 +227,7 @@
                                 return value;
                             }
                         },
-                        data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+                        data: y2
                     },
                     {
                         name: '同区域终端平均值',
@@ -276,13 +238,14 @@
                                 return value;
                             }
                         },
-                        data: [1.0, 1.2, 2.3, 6.5, 7.3, 4.2, 15.3, 29.4, 22.0, 11.5, 12.8, 3.2]
+                        data: y3
                     }
                 ]
             };
             myChart1.setOption(option);
 
             const myChart2 = echarts.init(document.getElementById('chart2'));
+            const pieCounts = {!! json_encode($pieCounts) !!};
             option = {
                 title: {
                     text: '',
@@ -298,16 +261,10 @@
                 },
                 series: [
                     {
-                        name: 'Access From',
+                        name: '',
                         type: 'pie',
                         radius: '50%',
-                        data: [
-                            {value: 104, name: '设备状态数据缺失'},
-                            {value: 735, name: '传感器数据缺失'},
-                            {value: 580, name: '传感器连接异常'},
-                            {value: 484, name: '六轴SD数据缺失'},
-                            {value: 300, name: '油位数据缺失'}
-                        ],
+                        data: pieCounts,
                         emphasis: {
                             itemStyle: {
                                 shadowBlur: 10,
