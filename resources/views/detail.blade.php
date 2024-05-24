@@ -30,26 +30,27 @@
             <a href="{{ route('index') }}" class="btn btn-secondary btn-sm">返回</a>
         </div>
 
-        <div class="row row-cols-4 mt-2 min-height-100 ">
-            <div class="col custom-bg-gray">
+        <div class="row row-cols-4 mt-2 min-height-100 custom-bg-gray">
+            <div class="col pt-3 custom-bg-gray">
                 <div class="">机械名称：测试机械1234</div>
             </div>
-            <div class="col custom-bg-gray">
+            <div class="col pt-3 custom-bg-gray">
                 <div class="">机械ID：102786</div>
             </div>
-            <div class="col custom-bg-gray">
+            <div class="col pt-3 custom-bg-gray">
                 <div class="">机械类型：挖掘机</div>
             </div>
-            <div class="col custom-bg-gray">
+            <div class="col pt-3 custom-bg-gray">
                 <div class="">工作模式：下发-实时A</div>
                 <div class="">当前：实时A</div>
             </div>
-            <div class="col mt-1 custom-bg-gray">
+            <div class="col mt-1 pt-1 pb-2 custom-bg-gray">
                 <div class="">智能终端： Z30185001700 Z03.0(正常)</div>
             </div>
         </div>
-        <div class="row mt-3 min-height-100">
-            <div>
+
+        <div class="row mt-3 min-height-100 custom-bg-gray">
+            <div class="pt-3">
                 <p><i class="bi bi-cpu-fill"></i>智能分析</p>
             </div>
             <div>
@@ -60,51 +61,127 @@
             </div>
         </div>
 
-        <div class="row mt-3 min-height-300">
-            <div class="col">
+        <div class="row mt-3 min-height-300 custom-bg-gray">
+            <div class="col pt-3">
                 <p><i class="bi bi-bar-chart-line-fill"></i>异常数据趋势</p>
                 <div id="chart1" style="width: 600px; height: 400px;"></div>
             </div>
-            <div class="col">
+            <div class="col pt-3">
                 <p><i class="bi bi-pie-chart-fill"></i>异常数据类型分布</p>
                 <div id="chart2" style="width: 420px; height: 400px;"></div>
             </div>
         </div>
 
-        <div class="row mt-3 min-height-200 align-items-center">
+        <div class="row mt-3 min-height-200 align-items-center custom-bg-gray">
             <p><i class="bi bi-fan"></i>数据状态</p>
-            <div class="col pl-2">
-                <div class="">设置状态<i class="bi bi-chevron-right"></i></div>
+            <div class="col m-lg-2 custom-bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>设置状态</div>
+                    <div>
+                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
+                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
                 <div class="mt-2">今日异常：2次</div>
                 <div class="mt-2">近3天异常：5次</div>
             </div>
-            <div class="col pl-2">
-                <div class="">传感器列表<i class="bi bi-chevron-right"></i></div>
+            <div class="col m-lg-2 custom-bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>传感器列表</div>
+                    <div>
+                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
+                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
                 <div class="mt-2">今日异常：2次</div>
                 <div class="mt-2">近3天异常：5次</div>
             </div>
-            <div class="col pl-2">
-                <div class="">模式参数<i class="bi bi-chevron-right"></i></div>
+            <div class="col m-lg-2 custom-bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>模式参数</div>
+                    <div>
+                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
+                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
                 <div class="mt-2">今日异常：2次</div>
                 <div class="mt-2">近3天异常：5次</div>
             </div>
-            <div class="col pl-2">
-                <div class="">GPS<i class="bi bi-chevron-right"></i></div>
+            <div class="col m-lg-2 custom-bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>GPS</div>
+                    <div>
+                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
+                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
                 <div class="mt-2">今日异常：2次</div>
                 <div class="mt-2">近3天异常：5次</div>
             </div>
-            <div class="col pl-2">
-                <div class="">心跳<i class="bi bi-chevron-right"></i></div>
+            <div class="col m-lg-2 custom-bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>心跳</div>
+                    <div>
+                        <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
+                           data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
                 <div class="mt-2">今日异常：2次</div>
                 <div class="mt-2">近3天异常：5次</div>
             </div>
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade modal-xl" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">心跳</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th scope="col">异常数据类型</th>
+                            <th scope="col">开始时间</th>
+                            <th scope="col">结束时间</th>
+                        </tr>
+                        </thead>
+                        <tbody class="">
+                        @for ($i = 0; $i < 10; $i++)
+                        <tr>
+                            <th scope="row">设备状态数据缺失</th>
+                            <td>2024-05-24 11:11:11</td>
+                            <td>2024-05-24 18:59:59</td>
+                        </tr>
+                        @endfor
+                        </tbody>
+                    </table>
+
+
+                </div>
+                <div class="modal-footer">
+                    {{--<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Understood</button>--}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section('top-js')
+        <script src="https://code.jquery.com/jquery-3.7.1.slim.js"
+                integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+    @endsection
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var myChart = echarts.init(document.getElementById('chart1'));
-            option = {
+            jQuery(document).ready(function () {
+
+            });
+            const myChart1 = echarts.init(document.getElementById('chart1'));
+            let option = {
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: {
@@ -182,11 +259,9 @@
                     }
                 ]
             };
-            myChart.setOption(option);
-        });
+            myChart1.setOption(option);
 
-        document.addEventListener('DOMContentLoaded', function () {
-            var myChart = echarts.init(document.getElementById('chart2'));
+            const myChart2 = echarts.init(document.getElementById('chart2'));
             option = {
                 title: {
                     text: 'Referer of a Website',
@@ -222,7 +297,7 @@
                     }
                 ]
             };
-            myChart.setOption(option);
+            myChart2.setOption(option);
         });
     </script>
 @endsection

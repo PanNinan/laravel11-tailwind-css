@@ -27,19 +27,22 @@
                 <button type="button" class="btn btn-primary btn-sm" id="submit">查询</button>
                 <button type="button" class="btn btn-secondary btn-sm" id="reset">重置</button>
             </div>
+            <div class="m-lg-2">
+                <button type="button" class="btn btn-primary btn-sm" id="config">异常设置</button>
+            </div>
         </div>
     </form>
     <div class="table-responsive shadow-sm bg-body rounded mt-3">
         <table class="table table-bordered table-striped text-center">
             <thead class="thead-dark">
                 <tr>
-                    <th scope="col-lg">机械名称</th>
-                    <th scope="col-lg">机械ID</th>
-                    <th scope="col-lg">机械类型</th>
-                    <th scope="col-lg">异常数据</th>
-                    <th scope="col-lg">工作模式</th>
-                    <th scope="col-lg">智能终端</th>
-                    <th scope="col-lg">操作</th>
+                    <th scope="row">机械名称</th>
+                    <th scope="row">机械ID</th>
+                    <th scope="row">机械类型</th>
+                    <th scope="row">异常数据</th>
+                    <th scope="row">工作模式</th>
+                    <th scope="row">智能终端</th>
+                    <th scope="row">操作</th>
                 </tr>
             </thead>
             <tbody>
