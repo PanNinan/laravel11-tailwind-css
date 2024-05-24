@@ -12,6 +12,7 @@
         "laravel/framework": "^11.0",
         "laravel/octane": "^2.3",
         "laravel/tinker": "^2.9",
+        "predis/predis": "^2.2",
         "spiral/roadrunner-cli": "^2.6.0",
         "spiral/roadrunner-http": "^3.3.0",
         "workerman/gateway-worker": "^3.1"
@@ -77,7 +78,11 @@
         },
         {
             "type": "composer",
-            "url": "https://packagist.phppkg.org/"
+            "url": "https://packagist.phpcomposer.com/"
+        },
+        {
+            "type": "composer",
+            "url": "https://repo.packagist.org/"
         }
     ]
 }
