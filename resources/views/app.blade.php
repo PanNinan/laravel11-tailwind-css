@@ -20,7 +20,7 @@
     </main>
 
     <footer class="pt-5 my-5 text-muted border-top">
-        Created by the Bootstrap team &middot; &copy; 2022
+        Created by the Lingyun Team &middot; &copy; 2024
     </footer>
 </div>
 </body>
