@@ -5,25 +5,26 @@
 @endsection
 @section('content')
     <form class="row" action="{{ route('index') }}" method="GET" accept-charset="UTF-8">
-{{--        <input type="hidden" name="_token" value="{{ csrf_token() }}">--}}
         <div class="col-lg form-floating mb-3">
-            <input type="text" class="form-control" id="machineName" placeholder="">
+            <input type="text" class="form-control" id="machineName" name="machineName" placeholder=""
+                   value="{{ request()->get('machineName') }}">
             <label for="machineName">机械名称</label>
         </div>
         <div class="col-lg mb-3 form-floating">
             <select class="form-select" id="category" name="category">
-                <option selected value="0">全部</option>
+                <option {{ !request()->get('category') ?: 'selected' }} value="0">全部</option>
                 @foreach($categories as $item)
-                    <option value="{{$item->id}}">{{$item->category_name}}</option>
+                    <option
+                        value="{{$item->id}}" {{ request()->get('category') == $item->id ? 'selected' : '' }}>{{$item->category_name}}</option>
                 @endforeach
             </select>
             <label for="category">机械类型</label>
         </div>
         <div class="col-lg mb-3 form-floating">
             <select class="form-select" id="errorType" name="errorType">
-                <option selected value="0">全部</option>
+                <option {{ !request()->get('errorType') ?: 'selected' }} value="0">全部</option>
                 @foreach($ruleMap as $i => $item)
-                    <option value="{{$i}}">{{$item}}</option>
+                    <option value="{{$i}}" {{ request()->get('errorType') == $i ? 'selected' : '' }}>{{$item}}</option>
                 @endforeach
             </select>
             <label for="errorType">异常数据</label>
@@ -82,7 +83,22 @@
     <script>
         $(function () {
             console.log('123')
-            // $('#datetimepicker1').datetimepicker();
+            $('#reset').on('click', function () {
+                var url = window.location.href;
+                var urlParts = url.split('?');
+                var baseUrl = urlParts[0];
+                var params = new URLSearchParams(urlParts[1]);
+
+                // 保留 page 参数
+                var pageValue = params.get('page');
+                params = new URLSearchParams();
+                if (pageValue) {
+                    params.set('page', pageValue);
+                    baseUrl = baseUrl + '?' + params.toString()
+                }
+
+                window.location.href = baseUrl;
+            });
         });
     </script>
 @endsection
