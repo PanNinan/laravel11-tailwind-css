@@ -7,7 +7,8 @@
         </div>
 
         <div class="row mt-3 min-height-200 align-items-center">
-            <form >
+            <form action="{{ route('put-setting') }}" method="POST" accept-charset="UTF-8">
+                @csrf
                 <div class="row mb-3">
                     <label for="inputEmail3" class="col-sm-3 col-form-label">终端设备状态数据缺失：</label>
                     <div class="col-sm-2">

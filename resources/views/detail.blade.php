@@ -139,16 +139,14 @@
                                     <thead>
                                     <tr>
                                         <th scope="col">异常数据类型</th>
-                                        <th scope="col">日期</th>
-                                        <th scope="col">小时</th>
+                                        <th scope="col">检测时间</th>
                                     </tr>
                                     </thead>
                                     <tbody class="">
                                     @foreach ($item['today'] as $value)
                                         <tr>
                                             <th scope="row">{{ $item['name'] }}</th>
-                                            <td>{{ $value['day'] ?? '2024-05-25' }}</td>
-                                            <td>{{ $value['hour'] ?? '18' }}</td>
+                                            <td>{{ $value['day'] ?? '2024-05-25' }} {{ ($value['hour'] ?? '16') . '时'}}</td>
                                         </tr>
                                     @endforeach
                                     </tbody>

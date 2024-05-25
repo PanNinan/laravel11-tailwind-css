@@ -4,6 +4,11 @@
             integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
 @endsection
 @section('content')
+    @if(session('message'))
+        <div id="alert" class="alert alert-success">
+            {{ session('message') }}
+        </div>
+    @endif
     <form class="row" action="{{ route('index') }}" method="GET" accept-charset="UTF-8">
         <div class="col-lg form-floating mb-3">
             <input type="text" class="form-control" id="machineName" name="machineName" placeholder=""
@@ -48,24 +53,26 @@
         <table class="table table-bordered table-striped text-center">
             <thead class="thead-dark">
             <tr>
-                <th scope="row">机械名称</th>
                 <th scope="row">机械ID</th>
+                <th scope="row">机械名称</th>
                 <th scope="row">机械类型</th>
                 <th scope="row">异常数据</th>
                 <th scope="row">电量</th>
                 <th scope="row">硬件</th>
+                <th scope="row">检测时间</th>
                 <th scope="row">操作</th>
             </tr>
             </thead>
             <tbody>
             @foreach($records as $i => $record)
                 <tr>
-                    <td class="align-middle py-3">{{$record->machine?->machine_name}}</td>
                     <td class="align-middle py-3">{{$record->machine_id}}</td>
+                    <td class="align-middle py-3">{{$record->machine?->machine_name}}</td>
                     <td class="align-middle py-3">{{$record->category?->category_name}}</td>
                     <td class="align-middle py-3">{{$ruleMap[$record->rule_id] ?? ''}}</td>
                     <td class="align-middle py-3">{{$record->device?->battery_percent ? $record->device?->battery_percent . '%' : '-'}}</td>
                     <td class="align-middle py-3">{{$record->type == 'terminal' ? $record->device?->product?->product_model : $record->sensor?->product?->product_model}}</td>
+                    <td class="align-middle py-3">{{$record->day . ' ' . $record->hour . '时'}}</td>
                     <td class="align-middle py-3">
                         <div class="d-flex justify-content-center">
                             <a class="btn btn-primary btn-sm"
@@ -78,12 +85,11 @@
         </table>
     </div>
     <div class="row mt-3">
-{{--        {{ $records->links() }}--}}
+        {{--        {{ $records->links() }}--}}
         {!! $records->appends(Request::except('page'))->render() !!}
     </div>
     <script>
         $(function () {
-            console.log('123')
             $('#reset').on('click', function () {
                 const url = window.location.href;
                 const urlParts = url.split('?');
@@ -100,6 +106,13 @@
 
                 window.location.href = baseUrl;
             });
+            const alert = document.getElementById('alert');
+            if (alert) {
+                alert.style.display = 'block';
+                setTimeout(function () {
+                    alert.style.display = 'none';
+                }, 2000); // 2秒后自动隐藏
+            }
         });
     </script>
 @endsection
