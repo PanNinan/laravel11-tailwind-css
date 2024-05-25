@@ -65,7 +65,7 @@
                     <td class="align-middle py-3">{{$record->category?->category_name}}</td>
                     <td class="align-middle py-3">{{$ruleMap[$record->rule_id] ?? ''}}</td>
                     <td class="align-middle py-3">{{$record->device?->battery_percent ? $record->device?->battery_percent . '%' : '-'}}</td>
-                    <td class="align-middle py-3">{{$record->type == 1 ? $record->device?->product?->product_model : $record->sensor?->product?->product_model}}</td>
+                    <td class="align-middle py-3">{{$record->type == 'terminal' ? $record->device?->product?->product_model : $record->sensor?->product?->product_model}}</td>
                     <td class="align-middle py-3">
                         <div class="d-flex justify-content-center">
                             <a class="btn btn-primary btn-sm"
@@ -85,13 +85,13 @@
         $(function () {
             console.log('123')
             $('#reset').on('click', function () {
-                var url = window.location.href;
-                var urlParts = url.split('?');
-                var baseUrl = urlParts[0];
-                var params = new URLSearchParams(urlParts[1]);
+                const url = window.location.href;
+                const urlParts = url.split('?');
+                let baseUrl = urlParts[0];
+                let params = new URLSearchParams(urlParts[1]);
 
                 // 保留 page 参数
-                var pageValue = params.get('page');
+                const pageValue = params.get('page');
                 params = new URLSearchParams();
                 if (pageValue) {
                     params.set('page', pageValue);

@@ -46,16 +46,15 @@
                 <div class="">机械类型：{{ $record->category?->category_name }}</div>
             </div>
             <div class="col pt-3 custom-bg-gray">
-                <div class="">电量：{{ $record->type == 1 ? $record->device?->battery_percent . '%' : '-' }}</div>
+                <div class="">
+                    电量：{{ $record->type == 'terminal' ? $record->device?->battery_percent . '%' : '-' }}</div>
             </div>
             <div class="col-6 mt-1 pt-1 pb-2 custom-bg-gray">
-                @if($record->type == 1)
+                @if($record->type == 'terminal')
                     <div class="">智能终端： {{ $record->device?->sn }} {{ $record->device?->product?->product_model }}
-                        (正常)
                     </div>
                 @else
                     <div class="">传感器： {{ $record->sensor?->sn }} {{ $record->sensor?->product?->product_model }}
-                        (正常)
                     </div>
                 @endif
             </div>
@@ -70,13 +69,36 @@
                 <p>该机械今日异常数据包括：{{$ruleNames}}</p>
             </div>
             <div>
-                <p>数据异常可能原因：1该类型终端硬件异常....</p>
+                <p>数据异常可能原因：</p>
+                @foreach($ruleIdMap as $i => $v)
+                    <p>
+                        {{$v}} :
+                        @foreach($reasons as $ii => $vv)
+                            @if($ii == $i)
+                                <span class="text-danger">{{ $vv }}</span>
+                            @endif
+                        @endforeach
+                    </p>
+                @endforeach
             </div>
         </div>
 
         <div class="row mt-3 min-height-300 custom-bg-gray">
             <div class="col pt-3">
                 <p><i class="bi bi-bar-chart-line-fill"></i>异常数据趋势</p>
+                <form id="ruleForm" class="row" action="{{ route('detail', ['id' => $record->id]) }}" method="GET"
+                      accept-charset="UTF-8">
+                    <div class="col-lg mb-3 form">
+                        <label for="rule_id"></label>
+                        <select class="form-select" id="rule_id" name="rule_id">
+                            @foreach($ruleIdMap as $i => $ruleName)
+                                <option
+                                    value="{{$i}}" {{ request()->get('rule_id') == $i ? 'selected' : '' }}>{{$ruleName}}</option>
+                            @endforeach
+                        </select>
+                        <label for="rule_id">异常数据</label>
+                    </div>
+                </form>
                 <div id="chart1" style="width: 600px; height: 400px;"></div>
             </div>
             <div class="col pt-3">
@@ -93,52 +115,64 @@
                         <div>{{ $item['name'] }}</div>
                         <div>
                             <a class="btn btn-link" href="#" role="button" data-bs-toggle="modal"
-                               data-bs-target="#staticBackdrop"><i class="bi bi-chevron-right"></i></a>
+                               data-bs-target="#staticBackdrop-{{$item['rule_id']}}"><i class="bi bi-chevron-right"></i></a>
                         </div>
                     </div>
-                    <div class="mt-2">今日异常：{{$item['today']??0}}次</div>
-                    <div class="mt-2">近3天异常：{{$item['three_day']??0}}次</div>
+                    <div class="mt-2">今日异常：{{$item['today']?count($item['today']):0}}次</div>
+                    <div class="mt-2">近3天异常：{{$item['three_day']?count($item['three_day']):0}}次</div>
+                </div>
+
+
+                <!-- Modal -->
+                <div class="modal fade modal-xl" id="staticBackdrop-{{$item['rule_id']}}" data-bs-backdrop="static"
+                     data-bs-keyboard="false"
+                     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel">{{ $item['name'] }}</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body shadow-sm">
+                                <table class="table table-striped table-bordered text-center">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">异常数据类型</th>
+                                        <th scope="col">日期</th>
+                                        <th scope="col">小时</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="">
+                                    @foreach ($item['today'] as $value)
+                                        <tr>
+                                            <th scope="row">{{ $item['name'] }}</th>
+                                            <td>{{ $value['day'] ?? '2024-05-25' }}</td>
+                                            <td>{{ $value['hour'] ?? '18' }}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @endforeach
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade modal-xl" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
-         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">心跳</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body shadow-sm">
-                    <table class="table table-striped table-bordered text-center">
-                        <thead>
-                        <tr>
-                            <th scope="col">异常数据类型</th>
-                            <th scope="col">开始时间</th>
-                            <th scope="col">结束时间</th>
-                        </tr>
-                        </thead>
-                        <tbody class="">
-                        @for ($i = 0; $i < 10; $i++)
-                            <tr>
-                                <th scope="row">设备状态数据缺失</th>
-                                <td>2024-05-24 11:11:11</td>
-                                <td>2024-05-24 18:59:59</td>
-                            </tr>
-                        @endfor
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             jQuery(document).ready(function () {
 
+            });
+            $(document).ready(function () {
+                // 监测select元素的值变化
+                $('#rule_id').change(function () {
+                    // 提交表单
+                    $('#ruleForm').submit();
+                });
             });
             const myChart1 = echarts.init(document.getElementById('chart1'));
             const xDate = {!! json_encode($xDate) !!};
@@ -180,7 +214,7 @@
                         type: 'value',
                         name: '每日异常次数',
                         min: 0,
-                        max: Math.max(...y1) + 10,
+                        max: Math.max(...y1) + 2,
                         // interval: 50,
                         axisLabel: {
                             formatter: '{value}'
@@ -190,7 +224,7 @@
                         type: 'value',
                         name: '同型号终端平均值',
                         min: 0,
-                        max: Math.max(...y2) + 10,
+                        max: Math.max(...y2) + 2,
                         interval: 5,
                         axisLabel: {
                             formatter: '{value}'
@@ -200,7 +234,7 @@
                         type: 'value',
                         name: '同区域终端平均值',
                         min: 0,
-                        max: Math.max(...y3) + 10,
+                        max: Math.max(...y3) + 2,
                         interval: 5,
                         axisLabel: {
                             formatter: '{value}'

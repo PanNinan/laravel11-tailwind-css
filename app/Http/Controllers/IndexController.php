@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Enum\Rule;
 use App\Models\Category;
 use App\Models\HackHardwareResult;
-use App\Models\HackSensorResult;
 use App\Models\Machine;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -26,7 +25,7 @@ class IndexController extends Controller
         $machineName = $request->input('machineName');
         $category = $request->input('category');
         $errorType = $request->input('errorType');
-        $searchDate = $request->input('searchDate');
+        $searchDate = $request->input('searchDate', now()->toDateString());
 
         $categories = Cache::remember('category-map', 3600, function () {
             return Category::query()
@@ -36,8 +35,10 @@ class IndexController extends Controller
                 ->select(['id', 'category_name'])
                 ->get();
         });
+        $today = now();
         $records = HackHardwareResult::query()
             ->with(['machine', 'category', 'device.product', 'sensor.product'])
+//            ->where('hour', $today->copy()->subHour()->format('G'))
             ->when(!empty($machineName), function (Builder $query) use ($machineName) {
                 $machineIds = Machine::query()
                     ->where('machine_name', 'like', "$machineName%")
@@ -52,6 +53,9 @@ class IndexController extends Controller
             })
             ->when(!empty($searchDate), function (Builder $query) use ($searchDate) {
                 $query->where('day', $searchDate);
+            })
+            ->when(empty($searchDate), function (Builder $query) {
+                $query->where('day', '>=', now()->toDateString());
             })
             ->orderBy('id')
             ->paginate();
@@ -72,12 +76,14 @@ class IndexController extends Controller
         $longitude = $record?->longitude;
         $latitude = $record?->latitude;
         // 异常数据类型分布
-        $errorMap = HackSensorResult::query()->select('rule_id', DB::raw('count(*) as value'))
+        $errorMap = HackHardwareResult::query()->select('rule_id', DB::raw('count(*) as value'))
             ->where('machine_id', $record?->machine_id)
-            ->where('day', now()->toDateString())
+            ->where('day', $record?->day)
+//            ->where('hour', $record?->hour)
             ->groupBy('rule_id')
             ->get();
         $ruleIds = $errorMap->pluck('rule_id')->toArray();
+        $ruleIdMap = collect(Rule::MAP)->only($ruleIds)->all();
         $pieCounts = $errorMap->transform(function ($item) {
             return ['name' => Rule::translate($item->rule_id), 'value' => $item->value];
         })->values()->toArray();
@@ -85,48 +91,66 @@ class IndexController extends Controller
 
         // 异常数据趋势
         $today = Carbon::now();
-        $startDate = $today->copy()->subDays(6);
-        $period = CarbonPeriod::create($startDate, $today);
+        $recordDay = explode('-', $record?->day);
+        $recordHour = $record?->hour;
+        $date = Carbon::create($recordDay[0] ?? 2024, $recordDay[1] ?? 5, $recordDay[2] ?? 25, $recordHour);
+        $startDate = $date->copy()->subHours(6);
+        $period = CarbonPeriod::create($startDate, $date);
 
-        $ruleId = \request()->get('rule_id', $ruleIds[0] ?? 1);
+        $ruleId = \request()->input('rule_id', $ruleIds[0] ?? 1);
 
         $xDate = [];
         $y1 = [];
         $y2 = [];
         $y3 = [];
         /** @var Carbon $date */
-        foreach ($period as $date) {
-            $xDate[] = $date->format('m-d');
+        foreach ($period->hours() as $date) {
+            $xDate[] = $date->format('H:i');
             // 每日异常次数
-            $y1[] = HackSensorResult::query()->where('machine_id', $record?->machine_id)
+            $y1[] = HackHardwareResult::query()->where('machine_id', $record?->machine_id)
                 ->where('day', $date->toDateString())
+                ->where('hour', $date->format('G'))
+                ->when($ruleId, function (Builder $query) use ($ruleId) {
+                    $query->where('rule_id', $ruleId);
+                })
                 ->count();
             // 同型号终端平均值
-            $machineIds = HackSensorResult::query()->where('day', $date->toDateString())
+            $machineIds = HackHardwareResult::query()
+                ->where('day', $date->toDateString())
+                ->where('hour', $date->format('G'))
+                ->when($ruleId, function (Builder $query) use ($ruleId) {
+                    $query->where('rule_id', $ruleId);
+                })
                 ->whereHas('sensor.product', function (Builder $query) use ($record) {
-                    $query->where('id', $record->sensor?->product?->id);
+                    $query->where('id', $record?->sensor?->product?->id);
                 })->pluck('machine_id')->unique()->toArray();
             if (!$machineIds) {
                 $machineIds = [null];
             }
-
             $averageCount = DB::select("SELECT AVG(cnt) AS average_count
 FROM (
     SELECT machine_id, COUNT(*) AS cnt
-    FROM `hack_sensor_result`
+    FROM `hack_hardware_result`
     WHERE machine_id IN (?)
     AND day = ?
+    AND hour = ?
     AND rule_id = ?
     GROUP BY machine_id
-) AS subquery;", [implode(',', $machineIds), $date->toDateString(), $ruleId]);
+) AS subquery;", [implode(',', $machineIds), $date->toDateString(), $date->format('G'), $ruleId]);
 
             $y2[] = (int)$averageCount[0]->average_count;
             // 同区域终端平均值
-            $areaMachineIds = DB::table('hack_sensor_result')
+            $areaMachineIds = DB::table('hack_hardware_result')
                 ->select('machine_id')
+                ->where('day', $date->toDateString())
+                ->where('hour', $date->format('G'))
+                ->when($ruleId, function (\Illuminate\Database\Query\Builder $query) use ($ruleId) {
+                    $query->where('rule_id', $ruleId);
+                })
                 ->selectRaw("( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance", [$latitude, $longitude, $latitude])
                 ->having('distance', '<', 10)
-                ->get()->pluck('machine_id')->unique()->values()->toArray();
+                ->get()
+                ->pluck('machine_id')->unique()->values()->toArray();
             if (!$areaMachineIds) {
                 $areaMachineIds = [null];
             }
@@ -134,34 +158,41 @@ FROM (
             $averageCount2 = DB::select("SELECT AVG(cnt) AS average_count
 FROM (
     SELECT machine_id, COUNT(*) AS cnt
-    FROM `hack_sensor_result`
+    FROM `hack_hardware_result`
     WHERE machine_id IN (?)
     AND day = ?
+    AND hour = ?
     AND rule_id = ?
     GROUP BY machine_id
-) AS subquery;", [implode(',', $areaMachineIds), $date->toDateString(), $ruleId]);
+) AS subquery;", [implode(',', $areaMachineIds), $date->toDateString(), $date->format('G'), $ruleId]);
             $y3[] = (int)$averageCount2[0]->average_count;
         }
-
         $dataStatistics = [];
         foreach (Rule::MAP as $id => $name) {
-
             $dataStatistics[] = [
+                'rule_id' => $id,
                 'name' => $name,
-                'today' => HackSensorResult::query()->where('machine_id', $record?->machine_id)
+                'today' => HackHardwareResult::query()->where('machine_id', $record?->machine_id)
                     ->where('day', $today->copy()->toDateString())
                     ->where('rule_id', $id)
-                    ->count(),
-                'three_day' => HackSensorResult::query()->where('machine_id', $record?->machine_id)
+                    ->select(['id', 'day', 'hour'])
+                    ->get(),
+                'three_day' => HackHardwareResult::query()->where('machine_id', $record?->machine_id)
                     ->whereBetween('day', [$today->copy()->subDays(2)->toDateString(), $today->copy()->toDateString()])
                     ->where('rule_id', $id)
-                    ->count(),
+                    ->select(['id', 'day', 'hour'])
+                    ->get(),
             ];
         }
+
+        //智能分析话术
+        $reasons = collect(Rule::REASON)->only($ruleIds)->all();
 
         return view('detail', [
             'record' => $record,
             'rule_ids' => $ruleIds,
+            'ruleIdMap' => $ruleIdMap,
+            'reasons' => $reasons,
             'pieCounts' => $pieCounts,
             'ruleIds' => $ruleIds,
             'ruleNames' => implode(',', $ruleNames),
