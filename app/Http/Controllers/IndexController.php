@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\DB;
 
 class IndexController extends Controller
 {
+    public function welcome()
+    {
+
+    }
+
     public function setting(Request $request)
     {
         return view('setting');
